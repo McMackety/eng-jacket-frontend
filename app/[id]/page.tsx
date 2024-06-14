@@ -1,7 +1,7 @@
 "use client";
 
 import pb from "@/utils/pb";
-import { Box, Chip, CircularProgress, Container, MenuItem, Paper, Select, Stack, Typography } from "@mui/material";
+import { Box, Button, Chip, CircularProgress, Container, MenuItem, Paper, Select, Stack, Typography } from "@mui/material";
 import { useParams, useRouter } from "next/navigation";
 import { RecordModel } from "pocketbase";
 import { useEffect, useState } from "react";
@@ -17,7 +17,7 @@ export default function Page() {
   const params = useParams();
   const router = useRouter();
   const [record, setRecord] = useState<RecordModel | null>(null);
-  const [color, setColor] = useState("B");
+  const [color, setColor] = useState("");
 
   useEffect(() => {
     requestData(params.id as string).then((record) => {
@@ -36,6 +36,17 @@ export default function Page() {
         </Paper>
       </Container>
     );
+  }
+
+  if ((record as any).cancelled) {
+    return (
+      <Container>
+        <Paper elevation={2} sx={{ padding: "20px" }}>
+          <Typography variant="h2" align="center">Hi, {(record as any).name}!</Typography>
+          <Typography variant="h4" align="center">Your order has been cancelled!</Typography>
+        </Paper>
+      </Container>
+    )
   }
 
   return (
@@ -62,6 +73,7 @@ export default function Page() {
           <Select
             value={color}
             label="Jacket Color"
+            displayEmpty={true}
             onChange={async (event) => {
               const record = await pb.collection('orders').update(params.id as string, { color: event.target.value });
               
@@ -80,9 +92,28 @@ export default function Page() {
             <MenuItem value={"NH"}>Navy Heather</MenuItem>
             <MenuItem value={"RR"}>Rich Red</MenuItem>
           </Select>
-          <img src={"/jacket/" + (record as any).color + ".jpg"} />
+          <JacketImg color={(record as any).color} />
+          <Stack direction="row" spacing={1} sx={{ padding: "10px" }}>
+            <Button variant="contained" color="error" onClick={async () => {
+              let res = confirm("Are you sure you want to cancel your order?")
+              if (!res) {
+                return;
+              }
+              
+              const record = await pb.collection('orders').update(params.id as string, { cancelled: true });
+              
+              setRecord(record);
+            }}>Cancel Order</Button>
+          </Stack>
         </Box>
       </Paper>
     </Container>
   );
+}
+
+function JacketImg({ color }: { color: string | null | undefined }) {
+  if (color == null || color == "") {
+    return <></>
+  }
+  return <img src={"/jacket/" + color + ".jpg"} />
 }

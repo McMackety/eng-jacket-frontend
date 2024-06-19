@@ -18,11 +18,15 @@ export default function Page() {
   const router = useRouter();
   const [record, setRecord] = useState<RecordModel | null>(null);
   const [color, setColor] = useState("");
+  const [size, setSize] = useState("");
+  const [style, setStyle] = useState("");
 
   useEffect(() => {
     requestData(params.id as string).then((record) => {
       setRecord(record);
       setColor((record as any).color);
+      setSize((record as any).size);
+      setStyle((record as any).gender);
     }).catch(_ => {
       router.push("/");
     });
@@ -83,16 +87,47 @@ export default function Page() {
           >
             <MenuItem value={"BG"}>Battleship Grey</MenuItem>
             <MenuItem value={"BC"}>Black Charcoal Heather</MenuItem>
-            <MenuItem value={"BN"}>Dress Blue Navy</MenuItem>
-            <MenuItem value={"M"}>Maroon</MenuItem>
+            <MenuItem value={"DS"}>Deep Smoke</MenuItem>
             <MenuItem value={"PG"}>Pearly Grey Heather</MenuItem>
-            <MenuItem value={"TR"}>True Royal</MenuItem>
             <MenuItem value={"B"}>Black</MenuItem>
-            <MenuItem value={"FG"}>Forest Green</MenuItem>
-            <MenuItem value={"NH"}>Navy Heather</MenuItem>
-            <MenuItem value={"RR"}>Rich Red</MenuItem>
           </Select>
           <JacketImg color={(record as any).color} />
+          <Typography variant="h4" align="center">Select your Size.</Typography>
+          <Select
+            value={size}
+            label="Jacket Size"
+            displayEmpty={true}
+            onChange={async (event) => {
+              const record = await pb.collection('orders').update(params.id as string, { size: event.target.value });
+              
+              setRecord(record);
+              setSize((record as any).size);
+            }}
+          >
+            <MenuItem value={"S"}>Small</MenuItem>
+            <MenuItem value={"M"}>Medium</MenuItem>
+            <MenuItem value={"LG"}>Large</MenuItem>
+            <MenuItem value={"XL"}>Extra Large</MenuItem>
+            <MenuItem value={"2XL"}>2 Extra Large</MenuItem>
+            <MenuItem value={"3XL"}>3 Extra Large</MenuItem>
+            <MenuItem value={"4XL"}>4 Extra Large</MenuItem>
+            <MenuItem value={"5XL"}>5 Extra Large</MenuItem>
+          </Select>
+          <Typography variant="h4" align="center">Select your Style.</Typography>
+          <Select
+            value={style}
+            label="Jacket Style"
+            displayEmpty={true}
+            onChange={async (event) => {
+              const record = await pb.collection('orders').update(params.id as string, { gender: event.target.value });
+              
+              setRecord(record);
+              setStyle((record as any).gender);
+            }}
+          >
+            <MenuItem value={"MALE"}>Men's</MenuItem>
+            <MenuItem value={"FEMALE"}>Women's</MenuItem>
+          </Select>
           <Stack direction="row" spacing={1} sx={{ padding: "10px" }}>
             <Button variant="contained" color="error" onClick={async () => {
               let res = confirm("Are you sure you want to cancel your order?")

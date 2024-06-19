@@ -125,8 +125,8 @@ export default function Page() {
               setStyle((record as any).gender);
             }}
           >
-            <MenuItem value={"MALE"}>Men's</MenuItem>
-            <MenuItem value={"FEMALE"}>Women's</MenuItem>
+            <MenuItem value={"MALE"}>Mens</MenuItem>
+            <MenuItem value={"FEMALE"}>Womens</MenuItem>
           </Select>
           <Stack direction="row" spacing={1} sx={{ padding: "10px" }}>
             <Button variant="contained" color="error" onClick={async () => {
